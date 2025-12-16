@@ -14,11 +14,11 @@
 import torch
 import numpy as np
 from typing import List, Tuple, Generator, Optional, Union
-from utils.vocos_util import load_vocos_jit
-from utils.hift_util import load_hift
+from utils.vocos_util import Vocos2DInference
+from utils.hift_util import HiFTInference
 
 class Token2Wav:
-    def __init__(self, flow, sample_rate: int = 24000, device: str = "cuda"):
+    def __init__(self, flow, sample_rate: int = 24000, device: str = "cuda", vocoder_path="ckpt/vocos2d/generator_jit.ckpt"):
         self.device = device
         self.flow = flow
         self.input_frame_rate = flow.input_frame_rate
@@ -28,11 +28,11 @@ class Token2Wav:
         if sample_rate == 32000:
             self.hop_size = 640
             self.sample_rate = 32000
-            self.vocoder = load_vocos_jit(device)
+            self.vocoder = Vocos2DInference(vocoder_path, device=device)
         elif sample_rate == 24000:
             self.hop_size = 480
             self.sample_rate = 24000
-            self.vocoder = load_hift(device)
+            self.vocoder = HiFTInference(vocoder_path, device=device, load_only_nsf=False)
         else:
             raise ValueError(f"Unsupported sample_rate: {sample_rate}")
     
