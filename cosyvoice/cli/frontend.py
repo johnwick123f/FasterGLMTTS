@@ -81,7 +81,6 @@ class SpeechTokenizer:
                         ).to('cuda')
                     audio = _resample_buffer[sample_rate](audio)
 
-                audio = torch.cat([audio, torch.zeros(audio.shape[0], 16000*2).to(audio.device)], dim=1)
                 audio = audio[0]  # Take first channel
                 audio = audio.cpu().numpy()
 
