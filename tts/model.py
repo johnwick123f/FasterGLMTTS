@@ -21,7 +21,7 @@ class GLMTTS:
         frontend, text_frontend, speech_tokenizer, flow = load_models(
             use_phoneme=False,
             sample_rate=24000,
-            model_dir=model_path
+            model_dir=model_path,
             DEVICE=self.DEVICE
         )
         backend_config = TurbomindEngineConfig(cache_max_entry_count=0.2)
@@ -43,7 +43,7 @@ class GLMTTS:
 
     def generate(self, text, reference_content, top_k=200, temperature=1.0, repetition_penalty=2.0, nsteps=2):
         """
-        Encodes audio into reference content
+        Generates speech from text
         """
         text_info = process_text(text)
         input_texts = process_inputs(self.frontend, self.text_frontend, self.tokenizer, text_info, reference_content['cache'], self.DEVICE, reference_content['embedding'], seed=0, flow_prompt_token=None, speech_feat=None, use_phoneme=False)
