@@ -15,7 +15,7 @@ from utils.audio import mel_spectrogram
 from functools import partial
 from utils.vocos_util import Vocos2DInference
 
-def load_frontends(speech_tokenizer, sample_rate=24000, use_phoneme=False, frontend_dir="frontend", model_dir='ckpt'):
+def load_frontends(speech_tokenizer, sample_rate=24000, use_phoneme=False, frontend_dir="frontend", model_dir='ckpt', DEVICE):
     
     feat_extractor = partial(mel_spectrogram, sampling_rate=sample_rate, hop_size=480, n_fft=1920, num_mels=80, win_size=1920, fmin=0, fmax=8000, center=False)
 
@@ -159,7 +159,7 @@ def process_inputs(frontend, text_frontend, tokenizer, text_info, cache, device,
         all_input_texts.append(input_text)
         return all_input_texts
 
-def load_models(use_phoneme=False, sample_rate=24000, model_dir='ckpt', vocos=True):
+def load_models(use_phoneme=False, sample_rate=24000, model_dir='ckpt', vocos=True, DEVICE):
     # Load Speech Tokenizer
     speech_tokenizer_path = os.path.join(model_dir, "speech_tokenizer")
     _model, _feature_extractor = yaml_util.load_speech_tokenizer(
@@ -168,7 +168,7 @@ def load_models(use_phoneme=False, sample_rate=24000, model_dir='ckpt', vocos=Tr
     speech_tokenizer = SpeechTokenizer(_model, _feature_extractor)
 
     # Load Frontends
-    frontend, text_frontend = load_frontends(speech_tokenizer, sample_rate=sample_rate, use_phoneme=use_phoneme, model_dir=model_dir)
+    frontend, text_frontend = load_frontends(speech_tokenizer, sample_rate=sample_rate, use_phoneme=use_phoneme, model_dir=model_dir, DEVICE)
 
     flow_ckpt = os.path.join(model_dir, "flow", "flow.pt")
     flow_config = os.path.join(model_dir, "flow", "config.yaml")
