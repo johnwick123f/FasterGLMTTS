@@ -158,3 +158,28 @@ def process_inputs(frontend, text_frontend, tokenizer, text_info, cache, device,
         input_text = tokenizer.decode(input_full[0])
         all_input_texts.append(input_text)
         return all_input_texts
+
+def load_models(use_phoneme=False, sample_rate=24000, model_dir='ckpt', vocos=True):
+    # Load Speech Tokenizer
+    speech_tokenizer_path = os.path.join(model_dir, "speech_tokenizer")
+    _model, _feature_extractor = yaml_util.load_speech_tokenizer(
+        speech_tokenizer_path
+    )
+    speech_tokenizer = SpeechTokenizer(_model, _feature_extractor)
+
+    # Load Frontends
+    frontend, text_frontend = load_frontends(speech_tokenizer, sample_rate=sample_rate, use_phoneme=use_phoneme, model_dir=model_dir)
+
+    flow_ckpt = os.path.join(model_dir, "flow", "flow.pt")
+    flow_config = os.path.join(model_dir, "flow", "config.yaml")
+    flow = yaml_util.load_flow_model(
+        flow_ckpt, flow_config, DEVICE
+    )
+    if vocos == True:
+        sample_rate = 32000
+        vocos_ckpt = os.path.join(model_dir, "vocos2d", "generator_jit.ckpt")
+    else:
+        vocos_ckpt = os.path.join(model_dir, "hift", "hift.pt")
+    token2wav = tts_model_util.Token2Wav(flow, sample_rate=sample_rate, device=DEVICE, vocoder_path=vocos_ckpt)
+
+    return frontend, text_frontend, speech_tokenizer, token2wav
